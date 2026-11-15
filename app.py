@@ -103,6 +103,11 @@ def select_story(variable: str, place: str) -> None:
     st.session_state["place"] = place
 
 
+def reveal_statistical_result() -> None:
+    """Reveal the result before Streamlit renders the feedback and button."""
+    st.session_state["show_statistical_result"] = True
+
+
 def chart_layout(fig: go.Figure, title: str, y_title: str, caption: str, x_title: str = "Date") -> None:
     fig.update_layout(title=title, xaxis_title=x_title, yaxis_title=y_title, paper_bgcolor="#FAF7F0",
                       plot_bgcolor="#FAF7F0", font=dict(family="Arial, sans-serif", color="#2A2A2A"),
@@ -205,9 +210,10 @@ with tabs[0]:
         st.markdown("**5 · What trend do you see?**")
         guess = st.radio("What trend do you see?", ["Rising", "Falling", "No clear trend"], horizontal=True,
                          label_visibility="collapsed", key="trend_guess")
-        guess_feedback = st.empty()
-        if st.button("Show statistical result", type="primary"):
-            st.session_state["show_statistical_result"] = True
+        if st.session_state.get("show_statistical_result"):
+            actual = "Rising" if (result.slope_per_decade or 0) > 0 else "Falling" if (result.slope_per_decade or 0) < 0 else "No clear trend"
+            st.caption(f"Your guess: {guess}. Statistical direction: {actual}.")
+        st.button("Show statistical result", type="primary", on_click=reveal_statistical_result)
         if st.session_state.get("show_statistical_result"):
             if result.slope_per_decade is not None:
                 cols = st.columns(4)
@@ -224,8 +230,6 @@ with tabs[0]:
                     st.warning(warning)
             if result.nonlinear:
                 st.info("The pattern is flagged as non-linear; a single rate may not describe the full period.")
-            actual = "Rising" if (result.slope_per_decade or 0) > 0 else "Falling" if (result.slope_per_decade or 0) < 0 else "No clear trend"
-            guess_feedback.caption(f"Your guess: {guess}. Statistical direction: {actual}.")
             download_result(result, "trend", "trend")
 
 with tabs[1]:
