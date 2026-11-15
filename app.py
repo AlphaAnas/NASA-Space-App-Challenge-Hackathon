@@ -205,6 +205,7 @@ with tabs[0]:
         st.markdown("**5 · What trend do you see?**")
         guess = st.radio("What trend do you see?", ["Rising", "Falling", "No clear trend"], horizontal=True,
                          label_visibility="collapsed", key="trend_guess")
+        guess_feedback = st.empty()
         if st.button("Show statistical result", type="primary"):
             st.session_state["show_statistical_result"] = True
         if st.session_state.get("show_statistical_result"):
@@ -224,7 +225,7 @@ with tabs[0]:
             if result.nonlinear:
                 st.info("The pattern is flagged as non-linear; a single rate may not describe the full period.")
             actual = "Rising" if (result.slope_per_decade or 0) > 0 else "Falling" if (result.slope_per_decade or 0) < 0 else "No clear trend"
-            st.caption(f"Your guess: {guess}. Statistical direction: {actual}.")
+            guess_feedback.caption(f"Your guess: {guess}. Statistical direction: {actual}.")
             download_result(result, "trend", "trend")
 
 with tabs[1]:
