@@ -136,13 +136,20 @@ def load_series(path: str | Path, place: str | None = None,
 def select_period(series: pd.Series, start_year: int, end_year: int,
                   months: Sequence[int] | None = None) -> pd.Series:
     """Crop to inclusive calendar years, optionally averaging selected months within each year."""
-    if end_year < start_year: raise ValueError("end_year must be greater than or equal to start_year")
+    if end_year < start_year:
+        raise ValueError("end_year must be greater than or equal to start_year")
     if months is not None and (not months or any(m < 1 or m > 12 for m in months)):
         raise ValueError("months must contain month numbers from 1 to 12")
     cropped = series[(series.index.year >= start_year) & (series.index.year <= end_year)]
-    if months is None: return cropped.copy()
+    if months is None:
+        return cropped.copy()
+
     chosen = cropped[cropped.index.month.isin(months)]
-result = chosen.groupby(chosen.index.year).agg(lambda x: x.mean() if x.notna().sum() >= (len(months) + 1) // 2 else np.nan)
+    result = chosen.groupby(chosen.index.year).agg(
+        lambda values: values.mean()
+        if values.notna().sum() >= (len(months) + 1) // 2
+        else np.nan
+    )
     result = result.reindex(range(start_year, end_year + 1))
     result.index = pd.to_datetime(result.index.astype(str) + "-01-01")
     result.index.name = "date"
