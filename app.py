@@ -38,7 +38,7 @@ SEASONS = {"All months": None, "Oct-Dec": [10, 11, 12], "Jul-Sep": [7, 8, 9]}
 COLORS = {"raw": "#8C8576", "trend": "#1F5C5C", "smooth": "#34434A", "band": "#B9D8D2"}
 
 
-st.set_page_config(page_title="Trend Detective", page_icon=None, layout="wide")
+st.set_page_config(page_title="Weather Guru Trend Detective", page_icon=None, layout="wide")
 
 
 st.markdown("""
@@ -156,7 +156,7 @@ def download_result(result, key_prefix: str, file_prefix: str) -> None:
                        f"{file_prefix}_series.csv", "text/csv", key=f"{key_prefix}_csv")
 
 
-st.title("Trend Detective")
+st.title("Weather Guru Trend Detective")
 st.write("Explore environmental time series, describe the pattern, and check what the statistical evidence supports.")
 data = catalog()
 if data.empty:
