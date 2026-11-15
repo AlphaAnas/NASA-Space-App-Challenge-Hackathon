@@ -142,7 +142,8 @@ def select_period(series: pd.Series, start_year: int, end_year: int,
     cropped = series[(series.index.year >= start_year) & (series.index.year <= end_year)]
     if months is None: return cropped.copy()
     chosen = cropped[cropped.index.month.isin(months)]
-    result = chosen.groupby(chosen.index.year).agg(lambda x: x.mean() if x.notna().sum() >= (len(months) + 1) // 2 else np.nan)
+result = chosen.groupby(chosen.index.year).agg(lambda x: x.mean() if x.notna().sum() >= (len(months) + 1) // 2 else np.nan)
+    result = result.reindex(range(start_year, end_year + 1))
     result.index = pd.to_datetime(result.index.astype(str) + "-01-01")
     result.index.name = "date"
     result.attrs.update(series.attrs)
