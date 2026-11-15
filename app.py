@@ -97,6 +97,12 @@ def file_for(frame: pd.DataFrame, variable: str, place: str) -> str:
     return str(found.iloc[0]._file)
 
 
+def select_story(variable: str, place: str) -> None:
+    """Apply a guided-story preset before Streamlit recreates its widgets."""
+    st.session_state["variable"] = variable
+    st.session_state["place"] = place
+
+
 def chart_layout(fig: go.Figure, title: str, y_title: str, caption: str, x_title: str = "Date") -> None:
     fig.update_layout(title=title, xaxis_title=x_title, yaxis_title=y_title, paper_bgcolor="#FAF7F0",
                       plot_bgcolor="#FAF7F0", font=dict(family="Arial, sans-serif", color="#2A2A2A"),
@@ -135,13 +141,14 @@ def trend_chart(result, modes: list[str], title: str | None = None) -> go.Figure
     return fig
 
 
-def download_result(result) -> None:
+def download_result(result, key_prefix: str, file_prefix: str) -> None:
     st.download_button("Download result as JSON", json.dumps(result.to_dict(), indent=2, allow_nan=False),
-                       "trend_result.json", "application/json")
+                       f"{file_prefix}_result.json", "application/json", key=f"{key_prefix}_json")
     rows = pd.DataFrame({"date": result.dates, "raw": result.raw,
                          "deseasonalized": result.deseasonalized, "trend_line": result.trend_line,
                          "smoothed": result.lowess})
-    st.download_button("Download series as CSV", rows.to_csv(index=False), "trend_series.csv", "text/csv")
+    st.download_button("Download series as CSV", rows.to_csv(index=False),
+                       f"{file_prefix}_series.csv", "text/csv", key=f"{key_prefix}_csv")
 
 
 st.title("Trend Detective")
@@ -169,15 +176,12 @@ with st.sidebar:
     season_name = st.selectbox("Season (optional)", list(SEASONS))
     season = SEASONS[season_name]
     st.markdown("**Guided stories**")
-    if st.button("Lahore and Delhi smog", use_container_width=True):
-        st.session_state.update(variable="aerosol", place="lahore")
-        st.rerun()
-    if st.button("Karachi heat", use_container_width=True):
-        st.session_state.update(variable="landtemp", place="karachicity")
-        st.rerun()
-    if st.button("Karachi rain", use_container_width=True):
-        st.session_state.update(variable="rainimerg", place="karachi")
-        st.rerun()
+    st.button("Lahore and Delhi smog", use_container_width=True,
+              on_click=select_story, args=("aerosol", "lahore"))
+    st.button("Karachi heat", use_container_width=True,
+              on_click=select_story, args=("landtemp", "karachicity"))
+    st.button("Karachi rain", use_container_width=True,
+              on_click=select_story, args=("rainimerg", "karachi"))
 
 tabs = st.tabs(["Trend Explorer", "Possible Reasons", "City vs Surroundings", "Method and Validation", "Data and Definitions"])
 start_year, end_year = year_range
@@ -221,7 +225,7 @@ with tabs[0]:
                 st.info("The pattern is flagged as non-linear; a single rate may not describe the full period.")
             actual = "Rising" if (result.slope_per_decade or 0) > 0 else "Falling" if (result.slope_per_decade or 0) < 0 else "No clear trend"
             st.caption(f"Your guess: {guess}. Statistical direction: {actual}.")
-            download_result(result)
+            download_result(result, "trend", "trend")
 
 with tabs[1]:
     st.subheader("Possible Reasons")
@@ -275,7 +279,7 @@ with tabs[2]:
             chart_layout(diff_chart, "City minus surroundings", unit_a, "Difference between aligned city and outside-city land temperature observations.")
             st.write("This series measures the extra change in the city compared with its surroundings.")
             st.write(diff_result.verdict)
-            download_result(diff_result)
+            download_result(diff_result, "city_difference", "city_difference")
         except ValueError as exc:
             st.warning(str(exc))
 
