@@ -110,11 +110,11 @@ We tried to be honest about the limits.
 ## The team
 
 We are six people from biotechnology, computer science and full-stack development, some of us working full time. 
-[Anas](linkedin.com/in/anasalpha/)
-[Zoha](https://www.linkedin.com/in/syeda-zoha-fatima-7a0b013b2)
-[Kalsoom]
-[Ahmed Mujtaba](https://www.linkedin.com/in/ahmed-e-mujtaba-361a3a318?)
-[Usama]
+- [Anas](linkedin.com/in/anasalpha/)
+- [Zoha](https://www.linkedin.com/in/syeda-zoha-fatima-7a0b013b2)
+- [Kalsoom]
+- [Ahmed Mujtaba](https://www.linkedin.com/in/ahmed-e-mujtaba-361a3a318?)
+- [Usama]
 
 ## Acknowledgements
 
