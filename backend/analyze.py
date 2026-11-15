@@ -212,7 +212,7 @@ def _pettitt(values: np.ndarray) -> tuple[int | None, float]:
     ranks = stats.rankdata(values)
     # U_t compares every value before the split with every value after it.
     u = 2 * np.cumsum(ranks) - np.arange(1, n + 1) * (n + 1)
-    k = int(np.argmax(np.abs(u)))
+k = int(np.argmax(np.abs(u[:-1]))) + 1
     p = min(1.0, 2 * np.exp((-6 * float(u[k] ** 2)) / (n ** 3 + n ** 2)))
     return k, p
 
